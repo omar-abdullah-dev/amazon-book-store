@@ -27,6 +27,7 @@
                     <th>ID</th>
                     <th>Title</th>
                     <th>Category</th>
+                    <th>Authors</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -52,6 +53,18 @@
                                 </c:otherwise>
                             </c:choose>
                         </td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${not empty tempBook.authors}">
+                                    <c:forEach var="author" items="${tempBook.authors}">
+                                        <span class="badge badge-author">${author.authorName}</span>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="text-muted">No Authors</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
                         <td class="action-links">
                             <a href="${updateLink}" class="btn btn-sm btn-edit">Update</a>
                             <a href="${deleteLink}" class="btn btn-sm btn-delete" 
@@ -62,7 +75,7 @@
 
                 <c:if test="${empty books}">
                     <tr>
-                        <td colspan="4" style="text-align: center; color: #888; padding: 30px;">
+                        <td colspan="5" style="text-align: center; color: #888; padding: 30px;">
                             No books available yet. Click "Add New Book" to add one!
                         </td>
                     </tr>

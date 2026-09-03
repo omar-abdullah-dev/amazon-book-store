@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
@@ -30,6 +31,26 @@
                     <form:option value="0" label="-- Select Category --" />
                     <form:options items="${categories}" itemValue="id" itemLabel="categoryName" />
                 </form:select>
+            </div>
+
+            <div class="form-group">
+                <label>Authors:</label>
+                <div class="checkbox-container">
+                    <c:forEach var="tempAuthor" items="${authors}">
+                        <c:set var="isAuthorSelected" value="false" />
+                        <c:forEach var="bookAuthor" items="${book.authors}">
+                            <c:if test="${bookAuthor.id == tempAuthor.id}">
+                                <c:set var="isAuthorSelected" value="true" />
+                            </c:if>
+                        </c:forEach>
+
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="authorIds" value="${tempAuthor.id}"
+                                   ${isAuthorSelected ? 'checked="checked"' : ''} />
+                            ${tempAuthor.authorName}
+                        </label>
+                    </c:forEach>
+                </div>
             </div>
 
             <div class="form-actions">
