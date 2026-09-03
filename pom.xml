@@ -78,6 +78,13 @@
             <version>${hibernate.version}</version>
         </dependency>
 
+        <!-- Hibernate Validator (JSR-303) -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.4.3.Final</version>
+        </dependency>
+
         <!-- ==================== MySQL ==================== -->
 
         <dependency>
