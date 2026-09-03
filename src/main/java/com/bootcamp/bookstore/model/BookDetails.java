@@ -2,6 +2,7 @@ package com.bootcamp.bookstore.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,17 +19,23 @@ public class BookDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
 
+    @Column(name = "isbn")
     private String isbn;
 
     @Temporal(TemporalType.DATE)
+    @Column(name = "publication_date")
     private Date publicationDate;
 
+    @Column(name = "publisher")
     private String publisher;
 
+    @Column(name = "number_of_pages")
     private int numberOfPages;
 
+    @Column(name = "language")
     private String language;
 
     @OneToOne(optional = false)

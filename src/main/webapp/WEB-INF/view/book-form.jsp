@@ -24,6 +24,14 @@
                 <form:input path="title" id="title" cssClass="form-control" placeholder="Enter book title" required="required"/>
             </div>
 
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <form:select path="category.id" id="category" cssClass="form-control">
+                    <form:option value="0" label="-- Select Category --" />
+                    <form:options items="${categories}" itemValue="id" itemLabel="categoryName" />
+                </form:select>
+            </div>
+
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Save Book</button>
                 <a href="${pageContext.request.contextPath}/book/list" class="btn btn-secondary">Cancel</a>

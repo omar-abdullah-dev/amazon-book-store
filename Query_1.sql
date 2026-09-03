@@ -9,3 +9,13 @@ select * from category;
 
 
 SELECT * FROM book_details;
+
+
+
+INSERT INTO category (category_name) VALUES
+                                         ('Computer Science & Programming'),
+                                         ('Science Fiction & Fantasy'),
+                                         ('History & Biography'),
+                                         ('Business & Economics'),
+                                         ('Self-Development & Psychology'),
+                                         ('Literature & Novels');

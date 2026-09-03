@@ -23,13 +23,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Book getBook(int id) {
         return bookDAO.findById(id);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Book> getBooks() {
         return bookDAO.findAll();
     }

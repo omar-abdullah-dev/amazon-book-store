@@ -26,6 +26,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Title</th>
+                    <th>Category</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -41,6 +42,16 @@
                     <tr>
                         <td>${tempBook.id}</td>
                         <td><strong>${tempBook.title}</strong></td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${not empty tempBook.category}">
+                                    <span class="badge badge-category">${tempBook.category.categoryName}</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="text-muted">Uncategorized</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
                         <td class="action-links">
                             <a href="${updateLink}" class="btn btn-sm btn-edit">Update</a>
                             <a href="${deleteLink}" class="btn btn-sm btn-delete" 
@@ -51,7 +62,7 @@
 
                 <c:if test="${empty books}">
                     <tr>
-                        <td colspan="3" style="text-align: center; color: #888; padding: 30px;">
+                        <td colspan="4" style="text-align: center; color: #888; padding: 30px;">
                             No books available yet. Click "Add New Book" to add one!
                         </td>
                     </tr>
