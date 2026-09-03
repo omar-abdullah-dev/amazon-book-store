@@ -46,53 +46,53 @@ public class BookController {
     }
 
     @GetMapping("/list")
-    public String listBooks(Model theModel) {
-        List<Book> theBooks = bookService.getBooks();
-        theModel.addAttribute("books", theBooks);
+    public String listBooks(Model model) {
+        List<Book> booksList = bookService.getBooks();
+        model.addAttribute("books", booksList);
         return "list-books";
     }
 
     @GetMapping("/showFormForAdd")
-    public String showFormForAdd(Model theModel) {
-        Book theBook = new Book();
-        theBook.setBookDetails(new BookDetails());
-        theBook.setCategory(new Category());
-        List<Category> categories = categoryService.getCategories();
-        List<Author> authors = authorService.getAuthors();
-        theModel.addAttribute("book", theBook);
-        theModel.addAttribute("categories", categories);
-        theModel.addAttribute("authors", authors);
+    public String showFormForAdd(Model model) {
+        Book bookModel = new Book();
+        bookModel.setBookDetails(new BookDetails());
+        bookModel.setCategory(new Category());
+        List<Category> categoriesList = categoryService.getCategories();
+        List<Author> authorsList = authorService.getAuthors();
+        model.addAttribute("book", bookModel);
+        model.addAttribute("categories", categoriesList);
+        model.addAttribute("authors", authorsList);
         return "book-form";
     }
 
     @PostMapping("/saveBook")
-    public String saveBook(@ModelAttribute("book") Book theBook,
+    public String saveBook(@ModelAttribute("book") Book bookModel,
                            @RequestParam(value = "authorIds", required = false) List<Integer> authorIds,
-                           Model theModel) {
+                           Model model) {
 
         boolean hasError = false;
 
         // Validate Title
-        if (theBook.getTitle() == null || theBook.getTitle().trim().isEmpty()) {
-            theModel.addAttribute("titleError", "Book title is required.");
+        if (bookModel.getTitle() == null || bookModel.getTitle().trim().isEmpty()) {
+            model.addAttribute("titleError", "Book title is required.");
             hasError = true;
         }
 
         // Validate Category
-        if (theBook.getCategory() == null || theBook.getCategory().getId() <= 0) {
-            theModel.addAttribute("categoryError", "Please select a category.");
+        if (bookModel.getCategory() == null || bookModel.getCategory().getId() <= 0) {
+            model.addAttribute("categoryError", "Please select a category.");
             hasError = true;
-            theBook.setCategory(new Category());
+            bookModel.setCategory(new Category());
         } else {
-            Category category = categoryService.getCategory(theBook.getCategory().getId());
-            theBook.setCategory(category != null ? category : new Category());
+            Category category = categoryService.getCategory(bookModel.getCategory().getId());
+            bookModel.setCategory(category != null ? category : new Category());
         }
 
-        // at least one author
+        // Validate Authors (at least one author)
         if (authorIds == null || authorIds.isEmpty()) {
-            theModel.addAttribute("authorError", "Please select at least one author for this book.");
+            model.addAttribute("authorError", "Please select at least one author for this book.");
             hasError = true;
-            theBook.setAuthors(new ArrayList<>());
+            bookModel.setAuthors(new ArrayList<>());
         } else {
             List<Author> selectedAuthors = new ArrayList<>();
             for (Integer authorId : authorIds) {
@@ -101,60 +101,92 @@ public class BookController {
                     selectedAuthors.add(author);
                 }
             }
-            theBook.setAuthors(selectedAuthors);
+            bookModel.setAuthors(selectedAuthors);
         }
 
-        //  Language
-        if (theBook.getBookDetails() == null ||
-            theBook.getBookDetails().getLanguage() == null ||
-            theBook.getBookDetails().getLanguage().trim().isEmpty()) {
-            theModel.addAttribute("languageError", "Please select a language for this book.");
+        // Validate Language
+        if (bookModel.getBookDetails() == null ||
+            bookModel.getBookDetails().getLanguage() == null ||
+            bookModel.getBookDetails().getLanguage().trim().isEmpty()) {
+            model.addAttribute("languageError", "Please select a language for this book.");
             hasError = true;
         }
 
-        if (hasError) {
-            if (theBook.getBookDetails() == null) {
-                theBook.setBookDetails(new BookDetails());
+        // Validate ISBN (Format & Uniqueness)
+        if (bookModel.getBookDetails() != null && bookModel.getBookDetails().getIsbn() != null) {
+            String isbn = bookModel.getBookDetails().getIsbn().trim();
+            if (isbn.isEmpty()) {
+                model.addAttribute("isbnError", "ISBN is required.");
+                hasError = true;
+            } else if (!isbn.matches("^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$") && !isbn.matches("^[0-9\\-]{9,20}$")) {
+                model.addAttribute("isbnError", "Invalid ISBN format. (Example: 978-0132350884)");
+                hasError = true;
+            } else {
+                // Check uniqueness against existing books
+                List<Book> allBooks = bookService.getBooks();
+                for (Book existingBook : allBooks) {
+                    if (existingBook.getId() != bookModel.getId() && 
+                        existingBook.getBookDetails() != null && 
+                        existingBook.getBookDetails().getIsbn() != null &&
+                        existingBook.getBookDetails().getIsbn().trim().equalsIgnoreCase(isbn)) {
+                        model.addAttribute("isbnError", "A book with ISBN '" + isbn + "' already exists. ISBN must be unique.");
+                        hasError = true;
+                        break;
+                    }
+                }
             }
-            List<Category> categories = categoryService.getCategories();
-            List<Author> authors = authorService.getAuthors();
-            theModel.addAttribute("categories", categories);
-            theModel.addAttribute("authors", authors);
+        }
+
+        if (hasError) {
+            if (bookModel.getBookDetails() == null) {
+                bookModel.setBookDetails(new BookDetails());
+            }
+            List<Category> categoriesList = categoryService.getCategories();
+            List<Author> authorsList = authorService.getAuthors();
+            model.addAttribute("categories", categoriesList);
+            model.addAttribute("authors", authorsList);
             return "book-form";
         }
 
-        if (theBook.getBookDetails() != null) {
-            theBook.getBookDetails().setBook(theBook);
+        if (bookModel.getBookDetails() != null) {
+            bookModel.getBookDetails().setBook(bookModel);
         }
 
-        if (theBook.getId() == 0) {
-            bookService.saveBook(theBook);
+        if (bookModel.getId() == 0) {
+            bookService.saveBook(bookModel);
         } else {
-            bookService.updateBook(theBook);
+            bookService.updateBook(bookModel);
         }
         return "redirect:/book/list";
     }
 
     @GetMapping("/showFormForUpdate")
-    public String showFormForUpdate(@RequestParam("bookId") int theId, Model theModel) {
-        Book theBook = bookService.getBook(theId);
-        if (theBook.getBookDetails() == null) {
-            theBook.setBookDetails(new BookDetails());
+    public String showFormForUpdate(@RequestParam("bookId") int bookId, Model model) {
+        Book bookModel = bookService.getBook(bookId);
+        if (bookModel.getBookDetails() == null) {
+            bookModel.setBookDetails(new BookDetails());
         }
-        if (theBook.getCategory() == null) {
-            theBook.setCategory(new Category());
+        if (bookModel.getCategory() == null) {
+            bookModel.setCategory(new Category());
         }
-        List<Category> categories = categoryService.getCategories();
-        List<Author> authors = authorService.getAuthors();
-        theModel.addAttribute("book", theBook);
-        theModel.addAttribute("categories", categories);
-        theModel.addAttribute("authors", authors);
+        List<Category> categoriesList = categoryService.getCategories();
+        List<Author> authorsList = authorService.getAuthors();
+        model.addAttribute("book", bookModel);
+        model.addAttribute("categories", categoriesList);
+        model.addAttribute("authors", authorsList);
         return "book-form";
     }
 
+    @GetMapping("/viewMore")
+    public String viewMoreBook(@RequestParam("bookId") int bookId, Model model) {
+        Book bookModel = bookService.getBook(bookId);
+        model.addAttribute("book", bookModel);
+        return "viewMore";
+    }
+
     @GetMapping("/delete")
-    public String deleteBook(@RequestParam("bookId") int theId) {
-        bookService.deleteBook(theId);
+    public String deleteBook(@RequestParam("bookId") int bookId) {
+        bookService.deleteBook(bookId);
         return "redirect:/book/list";
     }
 }

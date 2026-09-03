@@ -43,6 +43,13 @@ public class CategoryDAOImpl implements CategoryDAO {
     @Override
     public void delete(int id) {
         Session session = sessionFactory.getCurrentSession();
+        
+        // 1. Unlink any books assigned to this category
+        session.createQuery("update Book set category = null where category.id = :categoryId")
+               .setParameter("categoryId", id)
+               .executeUpdate();
+
+        // 2. Delete the category
         Category category = (Category) session.get(Category.class, id);
         if (category != null) {
             session.delete(category);

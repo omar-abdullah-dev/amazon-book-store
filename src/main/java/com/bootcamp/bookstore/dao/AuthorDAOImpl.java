@@ -43,6 +43,13 @@ public class AuthorDAOImpl implements AuthorDAO {
     @Override
     public void delete(int id) {
         Session session = sessionFactory.getCurrentSession();
+        
+        // 1. Remove references from book_author join table first
+        session.createSQLQuery("DELETE FROM book_author WHERE author_id = :authorId")
+               .setParameter("authorId", id)
+               .executeUpdate();
+
+        // 2. Delete the author
         Author author = (Author) session.get(Author.class, id);
         if (author != null) {
             session.delete(author);

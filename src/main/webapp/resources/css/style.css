@@ -1,33 +1,209 @@
-/* Custom Additions & Overrides for Bootstrap 5 */
+/* Amazon Book Store - Modern UI Design System & Theme Styles */
+
+:root {
+    --bg-body: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --amazon-yellow: #ff9900;
+    --amazon-dark: #131921;
+    --amazon-nav-dark: #232f3e;
+    --amazon-hover: #e68a00;
+    --badge-category-bg: #e0f2fe;
+    --badge-category-text: #0284c7;
+    --badge-author-bg: #f3e8ff;
+    --badge-author-text: #9333ea;
+}
+
+[data-bs-theme="dark"] {
+    --bg-body: #0f172a;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --badge-category-bg: #0369a1;
+    --badge-category-text: #e0f2fe;
+    --badge-author-bg: #6b21a8;
+    --badge-author-text: #f3e8ff;
+}
 
 body {
-    background-color: #f8fafc;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-.bg-purple-subtle {
-    background-color: #f3e8fd !important;
+/* Amazon Brand Navbar */
+.amazon-navbar {
+    background-color: var(--amazon-dark) !important;
+    border-bottom: 2px solid var(--amazon-yellow);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.text-purple {
-    color: #8e44ad !important;
+.amazon-brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.3px;
 }
 
-/* Modal styling refinement */
-.modal-content {
+.amazon-brand i {
+    color: var(--amazon-yellow);
+    font-size: 1.4rem;
+}
+
+.amazon-nav-link {
+    color: #cbd5e1 !important;
+    font-weight: 500;
+    padding: 0.5rem 0.9rem !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.amazon-nav-link:hover, .amazon-nav-link.active {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.amazon-nav-link.active {
+    border-bottom: 2px solid var(--amazon-yellow);
+    border-radius: 6px 6px 0 0;
+}
+
+/* Amazon Yellow Buttons */
+.btn-amazon {
+    background-color: var(--amazon-yellow);
+    color: #111827;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.btn-amazon:hover, .btn-amazon:focus {
+    background-color: var(--amazon-hover);
+    color: #000000;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(255, 153, 0, 0.3);
+}
+
+/* Card & Container Refinements */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Badges */
+.badge-category {
+    background-color: var(--badge-category-bg) !important;
+    color: var(--badge-category-text) !important;
+    font-weight: 500;
+    border: 1px solid rgba(2, 132, 199, 0.2);
+    border-radius: 6px;
+}
+
+.badge-author {
+    background-color: var(--badge-author-bg) !important;
+    color: var(--badge-author-text) !important;
+    font-weight: 500;
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    border-radius: 6px;
+}
+
+/* Modal Popup Refinement */
+.modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
 
 .modal-header {
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background-color: var(--amazon-dark);
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.modal-footer {
-    border-top: 1px solid #dee2e6;
+/* Theme Toggle Button */
+.theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
 }
 
-/* Card refinement */
-.card {
-    border-radius: 12px;
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--amazon-yellow);
+}
+
+/* Dark Mode Overrides for Tables and Form Elements */
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: var(--card-bg);
+    --bs-table-color: var(--text-main);
+    --bs-table-border-color: var(--border-color);
+    --bs-table-hover-bg: #273549;
+}
+
+[data-bs-theme="dark"] .table-light {
+    --bs-table-bg: #1e293b;
+    --bs-table-color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #0f172a;
+    border-color: var(--amazon-yellow);
+    color: #f8fafc;
+    box-shadow: 0 0 0 0.25rem rgba(255, 153, 0, 0.25);
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #1e293b !important;
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--card-bg) !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .text-secondary,
+[data-bs-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .border {
+    border-color: var(--border-color) !important;
 }

@@ -38,3 +38,9 @@ SELECT * FROM book_details;
 SELECT * FROM author;
 SELECT * FROM book_author;
 
+USE amazon_book_store;
+
+-- 1. مسح التصنيفات المكررة والإبقاء على نسخة واحدة فقط
+DELETE c1 FROM category c1
+                   INNER JOIN category c2
+WHERE c1.id > c2.id AND c1.category_name = c2.category_name;

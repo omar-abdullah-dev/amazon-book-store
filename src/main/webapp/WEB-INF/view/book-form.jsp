@@ -14,11 +14,44 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
-<body class="bg-light">
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark amazon-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand amazon-brand" href="${pageContext.request.contextPath}/">
+            <i class="bi bi-book-half"></i> Amazon Book Store
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#amazonNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="amazonNav">
+            <ul class="navbar-nav me-auto ms-lg-3">
+                <li class="nav-item">
+                    <a class="nav-link amazon-nav-link" href="${pageContext.request.contextPath}/"><i class="bi bi-house me-1"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link amazon-nav-link active" href="${pageContext.request.contextPath}/book/list"><i class="bi bi-collection me-1"></i> Books</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link amazon-nav-link" href="${pageContext.request.contextPath}/category/list"><i class="bi bi-tags me-1"></i> Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link amazon-nav-link" href="${pageContext.request.contextPath}/author/list"><i class="bi bi-people me-1"></i> Authors</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <i class="bi bi-moon-stars" id="themeIcon"></i> <span id="themeText">Dark</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
 
 <div class="container my-5" style="max-width: 650px;">
     <div class="header text-center mb-4">
-        <h2 class="fw-bold text-dark">
+        <h2 class="fw-bold">
             <i class="bi ${book.id == 0 ? 'bi-plus-circle-fill text-warning' : 'bi-pencil-square text-primary'} me-2"></i>
             ${book.id == 0 ? 'Add New Book' : 'Update Book'}
         </h2>
@@ -26,7 +59,7 @@
     </div>
 
     <!-- Global Backend Error Alert if any -->
-    <c:if test="${not empty titleError or not empty categoryError or not empty authorError or not empty languageError}">
+    <c:if test="${not empty titleError or not empty categoryError or not empty authorError or not empty languageError or not empty isbnError}">
         <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             <strong>Please correct the following errors:</strong>
@@ -35,6 +68,7 @@
                 <c:if test="${not empty categoryError}"><li>${categoryError}</li></c:if>
                 <c:if test="${not empty authorError}"><li>${authorError}</li></c:if>
                 <c:if test="${not empty languageError}"><li>${languageError}</li></c:if>
+                <c:if test="${not empty isbnError}"><li>${isbnError}</li></c:if>
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -118,8 +152,21 @@
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label for="isbn" class="form-label fw-semibold">ISBN</label>
-                        <form:input path="bookDetails.isbn" id="isbn" cssClass="form-control" placeholder="e.g. 978-0132350884" />
+                        <label for="isbn" class="form-label fw-semibold">
+                            ISBN <span class="text-danger">*</span>
+                        </label>
+                        <form:input path="bookDetails.isbn" id="isbn" 
+                                    cssClass="form-control ${not empty isbnError ? 'is-invalid border-danger' : ''}" 
+                                    placeholder="e.g. 978-0132350884" required="required" />
+                        <div class="form-text text-muted small">
+                            <i class="bi bi-info-circle me-1"></i> Format: e.g. 978-0132350884 (Must be unique)
+                        </div>
+                        <c:if test="${not empty isbnError}">
+                            <div class="invalid-feedback d-block">${isbnError}</div>
+                        </c:if>
+                        <div id="isbnClientError" class="text-danger small mt-1 d-none">
+                            <i class="bi bi-exclamation-circle-fill me-1"></i> Please enter a valid ISBN.
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <label for="publisher" class="form-label fw-semibold">Publisher</label>
@@ -181,7 +228,7 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" id="saveBtn" class="btn btn-warning fw-semibold px-4 shadow-sm">
+                    <button type="submit" id="saveBtn" class="btn btn-amazon shadow-sm px-4">
                         <i class="bi bi-check2-circle me-1"></i> Save Book
                     </button>
                     <a href="${pageContext.request.contextPath}/book/list" class="btn btn-secondary px-4">
@@ -197,9 +244,40 @@
 <!-- Bootstrap 5 Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Form Validation & Drag-and-Drop Script -->
+<!-- Theme Switcher Script -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    (function() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    })();
+
+    function updateThemeUI(theme) {
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        if (themeIcon && themeText) {
+            if (theme === 'dark') {
+                themeIcon.className = 'bi bi-sun-fill text-warning';
+                themeText.textContent = 'Light';
+            } else {
+                themeIcon.className = 'bi bi-moon-stars';
+                themeText.textContent = 'Dark';
+            }
+        }
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeUI(newTheme);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        updateThemeUI(currentTheme);
+
+        // Validation & Drag and Drop
         const bookForm = document.getElementById("bookForm");
         const authorsContainer = document.getElementById("authorsContainer");
         const authorClientError = document.getElementById("authorClientError");
@@ -233,8 +311,32 @@
                 isValid = false;
             }
 
+            // Validate ISBN
+            const isbnInput = document.getElementById("isbn");
+            const isbnClientError = document.getElementById("isbnClientError");
+            if (!isbnInput.value || isbnInput.value.trim() === "") {
+                e.preventDefault();
+                isbnInput.classList.add("is-invalid", "border-danger");
+                if (isbnClientError) isbnClientError.classList.remove("d-none");
+                if (isValid) {
+                    isbnInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isValid = false;
+            }
+
             return isValid;
         });
+
+        const isbnInput = document.getElementById("isbn");
+        if (isbnInput) {
+            isbnInput.addEventListener("input", function() {
+                if (this.value.trim() !== "") {
+                    this.classList.remove("is-invalid", "border-danger");
+                    const isbnClientError = document.getElementById("isbnClientError");
+                    if (isbnClientError) isbnClientError.classList.add("d-none");
+                }
+            });
+        }
 
         // 2. Clear Author Error when any checkbox is toggled
         authorCheckboxes.forEach(cb => {
