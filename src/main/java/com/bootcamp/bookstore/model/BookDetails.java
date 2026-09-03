@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 public class BookDetails {
@@ -18,6 +20,7 @@ public class BookDetails {
 
     private String isbn;
 
+    @Temporal(TemporalType.DATE)
     private Date publicationDate;
 
     private String publisher;
