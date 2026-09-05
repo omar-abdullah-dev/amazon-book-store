@@ -15,6 +15,9 @@ import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Pattern;
+import com.bootcamp.bookstore.util.AppConstants;
+
 @Entity
 @Table(name = "book_details")
 public class BookDetails {
@@ -24,6 +27,7 @@ public class BookDetails {
     @Column(name = "id")
     private int id;
 
+    @Pattern(regexp = AppConstants.ISBN_FORMAT, message = AppConstants.ISBN_ERROR_MESSAGE)
     @Column(name = "isbn")
     private String isbn;
 

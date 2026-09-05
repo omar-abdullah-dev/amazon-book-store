@@ -55,9 +55,9 @@
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill mb-3 fw-semibold">
-                    <i class="bi bi-stars me-1"></i> Spring MVC & Hibernate Book Inventory
-                </span>
+<%--                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill mb-3 fw-semibold">--%>
+<%--                    <i class="bi bi-stars me-1"></i> Spring MVC & Hibernate Book Inventory--%>
+<%--                </span>--%>
                 <h1 class="display-5 fw-bold mb-3">Welcome to Amazon Book Store</h1>
                 <p class="lead text-secondary mb-4">
                     A comprehensive management system to organize books, categorize genres, map authors, and track publication details with ease.

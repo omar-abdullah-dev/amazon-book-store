@@ -294,7 +294,7 @@
             const checkedAuthors = document.querySelectorAll(".author-checkbox:checked");
             if (checkedAuthors.length === 0) {
                 e.preventDefault();
-                authorsContainer.classList.add("border-danger", "bg-danger-subtle");
+                authorsContainer.classList.add("border-danger", "border-2", "bg-danger-subtle");
                 authorClientError.classList.remove("d-none");
                 authorsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 isValid = false;
@@ -338,12 +338,15 @@
             });
         }
 
-        // 2. Clear Author Error when any checkbox is toggled
+        // 2. Real-time Author Validation (on every checkbox click)
         authorCheckboxes.forEach(cb => {
             cb.addEventListener("change", function () {
                 const checkedCount = document.querySelectorAll(".author-checkbox:checked").length;
-                if (checkedCount > 0) {
-                    authorsContainer.classList.remove("border-danger", "bg-danger-subtle");
+                if (checkedCount === 0) {
+                    authorsContainer.classList.add("border-danger", "border-2", "bg-danger-subtle");
+                    authorClientError.classList.remove("d-none");
+                } else {
+                    authorsContainer.classList.remove("border-danger", "border-2", "bg-danger-subtle");
                     authorClientError.classList.add("d-none");
                 }
             });

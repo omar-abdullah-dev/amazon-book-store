@@ -105,9 +105,11 @@ public class BookController {
         }
 
         // Validate Language
-        if (bookModel.getBookDetails() == null ||
+        if (
+            bookModel.getBookDetails() == null ||
             bookModel.getBookDetails().getLanguage() == null ||
-            bookModel.getBookDetails().getLanguage().trim().isEmpty()) {
+            bookModel.getBookDetails().getLanguage().trim().isEmpty()
+        ) {
             model.addAttribute("languageError", "Please select a language for this book.");
             hasError = true;
         }
@@ -118,8 +120,8 @@ public class BookController {
             if (isbn.isEmpty()) {
                 model.addAttribute("isbnError", "ISBN is required.");
                 hasError = true;
-            } else if (!isbn.matches("^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$") && !isbn.matches("^[0-9\\-]{9,20}$")) {
-                model.addAttribute("isbnError", "Invalid ISBN format. (Example: 978-0132350884)");
+            } else if (!isbn.matches(com.bootcamp.bookstore.util.AppConstants.ISBN_FORMAT)) {
+                model.addAttribute("isbnError", com.bootcamp.bookstore.util.AppConstants.ISBN_ERROR_MESSAGE);
                 hasError = true;
             } else {
                 // Check uniqueness against existing books
