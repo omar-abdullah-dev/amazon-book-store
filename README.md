@@ -10,13 +10,13 @@ An enterprise-grade, full-stack Book Inventory Management Web Application built 
   - **Browse Inventory:** Responsive table showing Book Title, Category badge, Author badges, ISBN, and action controls.
   - **Quick Details Modal:** Instant preview modal popup for publication details (Publisher, Date, Pages, Language) without full page reload.
   - **Dedicated `viewMore` Page:** Dedicated full-page view showing comprehensive book metadata and publication information (`/book/viewMore?bookId={id}`).
-  - **Add & Update Books:** Robust form with real-time feedback and dynamic category & author binding.
+  - **Add & Update Books:** Robust form with real-time feedback, dynamic category selection, and author checkbox bindings.
   - **Custom Delete Confirmation:** Sleek Bootstrap 5 modal warning before permanent removal.
 
 - **🏷️ Category Management (Many-to-One):**
   - Dedicated category management (`/category/list`).
   - Add, update, and delete categories with unique name validation.
-  - Safe unlinking of books on category deletion (`category_id = NULL`) to prevent orphaned books or constraint failures.
+  - Safe unlinking of books on category deletion (`category_id = NULL`) to prevent orphaned books or foreign key constraint failures.
 
 - **✍️ Author Directory (Many-to-Many):**
   - Dedicated author directory (`/author/list`).
@@ -40,6 +40,7 @@ An enterprise-grade, full-stack Book Inventory Management Web Application built 
 - **🛡️ Full-Stack Validation & Data Integrity:**
   - **Frontend:** HTML5 required attributes + JavaScript submit-time validation for Title, Category, at least 1 Author, mandatory Language, and ISBN format.
   - **Backend:** Spring MVC Controller validation with customized error alerts and model preservation.
+  - **Bean Validation:** `@Pattern` validation on `BookDetails.isbn` using centralized constants in `AppConstants.java`.
   - **Uniqueness Checks:** Unique ISBN enforcement for books, unique Category names, and unique Author names.
 
 ---
@@ -50,7 +51,7 @@ An enterprise-grade, full-stack Book Inventory Management Web Application built 
 | :--- | :--- |
 | **Backend Framework** | Spring Framework `4.3.30.RELEASE` (Spring MVC, Spring ORM, Spring Tx) |
 | **ORM / Persistence** | Hibernate ORM `4.3.8.Final`, JPA 2.1 Annotations |
-| **Bean Validation** | Hibernate Validator `5.4.3.Final` (JSR-303) |
+| **Bean Validation** | Hibernate Validator `5.4.3.Final` (JSR-303 / Bean Validation) |
 | **Database** | MySQL 8.0 with MySQL Connector `8.0.33` |
 | **Connection Pool** | C3P0 `ComboPooledDataSource` |
 | **Frontend / Views** | JSP 2.1, JSTL 1.2, HTML5, CSS3, JavaScript |
@@ -95,6 +96,11 @@ An enterprise-grade, full-stack Book Inventory Management Web Application built 
   │ author_name  │ (UQ)
   └──────────────┘
 ```
+
+### Configuration Architecture:
+- **`src/main/resources/database.properties`:** Contains pure JDBC connection properties (`db.driver`, `db.url`, `db.user`, `db.password`).
+- **`src/main/resources/hibernate.cfg.xml`:** Dedicated Hibernate configuration for dialect, SQL formatting, and schema auto-generation (`hbm2ddl.auto`).
+- **`src/main/resources/application-context.xml`:** Spring IoC container configuration wiring C3P0 DataSource, LocalSessionFactoryBean (via `configLocation="classpath:hibernate.cfg.xml"`), HibernateTransactionManager, and ViewResolver.
 
 ---
 
@@ -155,9 +161,17 @@ classDiagram
         +getBooks() List~Book~
     }
 
+    class AppConstants {
+        <<utility>>
+        +String ISBN_FORMAT$
+        +String ISBN_ERROR_MESSAGE$
+        +String DATE_FORMAT$
+    }
+
     Book "1" *-- "1" BookDetails : OneToOne (Cascade ALL)
     Book "N" --> "1" Category : ManyToOne
     Book "M" <--> "N" Author : ManyToMany
+    BookDetails ..> AppConstants : uses constants
 ```
 
 ---
@@ -221,6 +235,19 @@ sequenceDiagram
     Controller-->>Browser: Redirect to /author/list
     Browser-->>User: Display Cleaned Authors List
 ```
+
+---
+
+## 🌿 Git Branching Strategy
+
+| Branch | Description |
+| :--- | :--- |
+| `feature/domain-model` | Domain Model Entities (`Book`, `BookDetails`, `Category`, `Author`) and Hibernate mapping configuration. |
+| `feature/book-crud` | Book DAO, Service, Controller, and full CRUD inventory views (`list-books.jsp`, `book-form.jsp`). |
+| `feature/category-crud` | Category DAO, Service, Controller, and management views (`list-categories.jsp`, `category-form.jsp`). |
+| `feature/author-crud` | Author DAO, Service, Controller, and directory views (`list-authors.jsp`, `author-form.jsp`). |
+| `feature/book-details` | BookDetails entity OneToOne lifecycle, `AppConstants.java`, ISBN validation, and `viewMore.jsp`. |
+| `main` | Production-ready unified codebase with Amazon UI themes, live search, custom modals, and complete documentation. |
 
 ---
 
@@ -292,7 +319,7 @@ INSERT INTO book_author (book_id, author_id) VALUES
 3. Update database credentials in `src/main/resources/database.properties` if needed:
 ```properties
 db.driver=com.mysql.cj.jdbc.Driver
-db.url=jdbc:mysql://localhost:3306/amazon_book_store?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+db.url=jdbc:mysql://localhost:3306/amazon_book_store?useSSL=false
 db.user=root
 db.password=root
 ```
@@ -359,6 +386,8 @@ amazon-book-store/
         │   │   ├── BookService.java & BookServiceImpl.java
         │   │   ├── CategoryService.java & CategoryServiceImpl.java
         │   │   └── AuthorService.java & AuthorServiceImpl.java
+        │   ├── util/
+        │   │   └── AppConstants.java
         │   └── model/
         │       ├── Book.java
         │       ├── BookDetails.java
@@ -366,6 +395,7 @@ amazon-book-store/
         │       └── Author.java
         ├── resources/
         │   ├── application-context.xml
+        │   ├── hibernate.cfg.xml
         │   └── database.properties
         └── webapp/
             ├── resources/css/style.css
